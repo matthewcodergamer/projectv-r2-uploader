@@ -1,1 +1,618 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"><meta name="theme-color" content="#111511"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Project V Uploader" /><meta name="application-name" content="Project V Uploader" /><link rel="manifest" href="./manifest.webmanifest?v=11" /><link rel="icon" type="image/png" sizes="32x32" href="./favicon-32.png?v=11" /><link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png?v=11" /><link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png?v=11" /><link rel="shortcut icon" href="./favicon-32.png?v=11" /><title>Project V Uploader</title><style>:root{color-scheme:dark;--bg:#0b0e0b;--p:#171b17;--p2:#101410;--t:#f0efe6;--m:#98a08f;--l:#343a31;--g:#9dcc55;--r:#d66f68;--ok:#9bd778}*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0;min-height:100%;background:#0b0e0b;color:var(--t);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif}body{padding:calc(env(safe-area-inset-top) + 14px) 14px calc(env(safe-area-inset-bottom) + 28px);display:flex;justify-content:center}body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.18;background:linear-gradient(27deg,transparent 48%,#44503c 49%,transparent 50%) 0 0/180px 145px,linear-gradient(151deg,transparent 47%,#394334 48%,transparent 49%) 0 0/230px 170px;mask-image:linear-gradient(#000,transparent 76%)}main{position:relative;z-index:1;width:min(760px,100%)}header{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;padding:8px 2px 18px;border-bottom:1px solid #242a22;margin-bottom:16px}.mark{width:54px;height:54px;border-radius:11px;background:#efefe7;border:2px solid #090b09;box-shadow:0 0 0 1px #596050,0 8px 24px #0008;display:grid;place-items:center;position:relative}.mark b{font:900 30px/1 Arial Black,Impact,sans-serif;color:#111;letter-spacing:-3px}.mark i{position:absolute;right:4px;bottom:4px;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;background:var(--g);border:2px solid #111;color:#10130e;font:bold 13px/1 system-ui;font-style:normal}.eye{font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:#7f8878;margin-bottom:4px}h1{font-size:22px;line-height:1;margin:0;letter-spacing:-.04em}.sub{font-size:11px;color:var(--m);margin-top:5px}.online{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;border:1px solid var(--l);padding:9px 8px;border-radius:4px;background:#101410;color:var(--m)}.online.ok{color:var(--ok);border-color:#49623c}.online.bad{color:#e48780;border-color:#603d39}.card{background:#151915;border:1px solid var(--l);border-radius:7px;margin-bottom:14px;overflow:hidden;box-shadow:0 15px 40px #0004}.hd{padding:13px 15px;border-bottom:1px solid #242a22;background:#111511;display:flex;justify-content:space-between}.hd b{font-size:11px;letter-spacing:.12em;text-transform:uppercase}.hd span{font-size:10px;color:var(--m)}.drop{text-align:center;padding:27px 17px 23px;background:repeating-linear-gradient(0deg,#151915 0 31px,#171b17 32px)}.v{font:900 62px/.9 Arial Black,Impact,sans-serif;letter-spacing:-7px;margin-bottom:11px}.drop strong{display:block;font-size:23px;letter-spacing:-.03em;margin-bottom:8px}.drop p{max-width:540px;margin:0 auto 19px;color:var(--m);font-size:12px;line-height:1.55}button,.button{appearance:none;border:1px solid transparent;border-radius:4px;padding:15px 17px;font:800 14px/1 system-ui;cursor:pointer}.primary{width:100%;background:var(--g);color:#0e110c;border-color:#b9da80}.secondary{background:#20251f;color:var(--t);border-color:#3a4237}.danger{background:#2a1a19;color:#e98a83;border-color:#603632}button:disabled{opacity:.38}input[type=file]{display:none}.file{display:none;margin:15px;padding:13px;text-align:left;background:#0e120e;border:1px solid #272d25;border-left:3px solid var(--g)}.file.show{display:block}.fn{font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.fm{font-size:11px;color:var(--m);margin-top:5px}.ctl,.pb{padding:14px 15px}.actions{display:grid;grid-template-columns:1fr 1fr;gap:9px}.wide{grid-column:1/-1}.note{font-size:10.5px;line-height:1.5;color:#8d9587;margin:11px 2px 0}.route{padding:10px 15px;background:#0e120e;border-top:1px solid #20251f;text-align:center;font-size:9px;text-transform:uppercase;letter-spacing:.15em;color:#87917f}.progress{display:none}.progress.show{display:block}.row{display:flex;justify-content:space-between;align-items:end}.pct{font-size:50px;font-weight:900;letter-spacing:-.07em;line-height:.9}.state{font-size:10px;text-transform:uppercase;letter-spacing:.09em;color:var(--m)}.bar{height:8px;background:#090c09;border:1px solid #272d25;margin:17px 0 13px}.fill{height:100%;width:0;background:var(--g)}.stats{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#242a22;border:1px solid #242a22}.st{background:#101410;padding:12px}.st span{display:block;color:#7d8677;font-size:8px;letter-spacing:.16em;text-transform:uppercase;margin-bottom:6px}.st b{font-size:14px}.log{max-height:180px;overflow:auto;margin-top:12px;padding:11px;background:#090c09;border:1px solid #242a22;font:10px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace;color:#a7afa0;white-space:pre-wrap}@media(min-width:650px){.stats{grid-template-columns:repeat(4,1fr)}}.master-icon{width:54px;height:54px;border-radius:11px;display:block;object-fit:cover;box-shadow:0 0 0 1px #596050,0 8px 24px #0008}</style></head><body><main><header><img class="master-icon" src="./apple-touch-icon.png?v=11" alt="Project V Uploader"><div><div class="eye">Project V / Utility</div><h1>Project V Uploader</h1><div class="sub">Resumable source upload to Cloudflare R2</div></div><div id="connection" class="online">Checking…</div></header><section class="card"><div class="hd"><b>Source Archive</b><span>R2 / source</span></div><div class="drop"><div class="v">V</div><strong>Select installation archive</strong><p>The file stays on your iPhone. It uploads in resumable 32 MiB parts with two parallel streams, so completed pieces survive pause, refresh, and network changes.</p><label class="button primary" for="picker">Choose .7z archive</label><input id="picker" type="file" accept=".7z,application/x-7z-compressed,application/octet-stream"><div id="fileBox" class="file"><div id="fileName" class="fn"></div><div id="fileMeta" class="fm"></div></div></div><div class="ctl"><div class="actions"><button id="start" class="primary wide" disabled>Start transfer</button><button id="test" class="secondary wide">Test R2 connection</button></div><p class="note">Safe network switch: Pause → wait for “Paused safely” → switch Wi‑Fi/mobile data → wait for R2 online → Resume.</p></div><div class="route">Device → Cloudflare Worker → R2</div></section><section id="progressCard" class="card progress"><div class="hd"><b>Transfer Monitor</b><span>Multipart session</span></div><div class="pb"><div class="row"><div id="percent" class="pct">0%</div><div id="state" class="state">Ready</div></div><div class="bar"><div id="fill" class="fill"></div></div><div class="stats"><div class="st"><span>Uploaded</span><b id="uploaded">0 B</b></div><div class="st"><span>Speed</span><b id="speed">—</b></div><div class="st"><span>Parts</span><b id="part">0 / 0</b></div><div class="st"><span>ETA</span><b id="eta">—</b></div></div><div class="actions" style="margin-top:11px"><button id="pause" class="secondary" disabled>Pause</button><button id="resume" class="secondary" disabled>Resume</button><button id="abort" class="danger wide" disabled>Abort transfer</button></div><div id="log" class="log">Waiting.</div></div></section></main><script>(()=>{'use strict';const W='https://projectv-storage.hrhw55tdmw.workers.dev',C=32*1024*1024,N=2,R=12,$=id=>document.getElementById(id),u={picker:$('picker'),fileBox:$('fileBox'),fileName:$('fileName'),fileMeta:$('fileMeta'),start:$('start'),test:$('test'),connection:$('connection'),progressCard:$('progressCard'),percent:$('percent'),fill:$('fill'),state:$('state'),uploaded:$('uploaded'),speed:$('speed'),part:$('part'),eta:$('eta'),pause:$('pause'),resume:$('resume'),abort:$('abort'),log:$('log')};let f=null,s=null,paused=false,aborted=false,running=false,xhrs=new Map(),flight=new Map(),samples=[],lastT=performance.now(),lastB=0;const sleep=ms=>new Promise(r=>setTimeout(r,ms)),fb=n=>{if(!n)return'0 B';let a=['B','KB','MB','GB','TB'],i=0;while(n>=1024&&i<4)n/=1024,i++;return n.toFixed(i>=3?2:i==2?1:0)+' '+a[i]},ft=n=>{if(!isFinite(n))return'—';n=Math.round(n);let h=n/3600|0,m=n%3600/60|0;return h?h+'h '+m+'m':m?m+'m '+n%60+'s':n+'s'},safe=n=>n.replace(/[\\/]+/g,'_').replace(/[^\w.()\- ]/g,'_').slice(0,180)||'archive.7z',key=f=>`projectv:r2:v2:${f.name}:${f.size}:${f.lastModified}`,old=f=>`projectv:r2:${f.name}:${f.size}:${f.lastModified}`,log=m=>{let t=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'});u.log.textContent=`${t}  ${m}\n`+u.log.textContent.slice(0,7000)},save=()=>{if(f&&s)try{localStorage.setItem(key(f),JSON.stringify(s))}catch{}},clear=()=>{if(f){localStorage.removeItem(key(f));localStorage.removeItem(old(f))}};async function api(p,o={}){let r=await fetch(W+p,o),t=await r.text(),d;try{d=JSON.parse(t)}catch{d={error:t||`HTTP ${r.status}`}}if(!r.ok)throw Error(d.error||`HTTP ${r.status}`);return d}async function test(){u.connection.textContent='Checking…';u.connection.className='online';try{let h=await api('/');if(!h.ok||!h.multipart)throw Error('Multipart unavailable');await api('/files?prefix=source/');u.connection.textContent='R2 online';u.connection.className='online ok';log('Worker and R2 connection OK.');return true}catch(e){u.connection.textContent=navigator.onLine?'Offline':'No network';u.connection.className='online bad';log('Connection failed: '+e.message);return false}}const ps=n=>Math.max(0,Math.min(C,f.size-(n-1)*C)),done=()=>!f||!s?0:Object.keys(s.parts||{}).reduce((a,k)=>a+ps(+k),0),inflight=()=>[...flight.values()].reduce((a,b)=>a+b,0);function draw(){if(!f||!s)return;let b=Math.min(f.size,done()+inflight()),p=f.size?b/f.size*100:0;u.percent.textContent=p.toFixed(p>=10?1:2)+'%';u.fill.style.width=p+'%';u.uploaded.textContent=`${fb(b)} / ${fb(f.size)}`;let total=Math.ceil(f.size/C);u.part.textContent=`${Object.keys(s.parts||{}).length} / ${total}`;let now=performance.now(),dt=(now-lastT)/1000;if(dt>=.7){let sp=Math.max(0,b-lastB)/dt;lastT=now;lastB=b;if(sp>0){samples.push(sp);if(samples.length>10)samples.shift();let av=samples.reduce((a,z)=>a+z,0)/samples.length;u.speed.textContent=fb(av)+'/s';u.eta.textContent=ft((f.size-b)/av)}}}function load(f){let raw=localStorage.getItem(key(f))||localStorage.getItem(old(f));if(!raw)return null;try{let x=JSON.parse(raw);if(x.fileSize===f.size&&x.uploadId&&x.chunkSize===C){x.version=2;x.parts=x.parts||{};log(`Found resumable session with ${Object.keys(x.parts).length} completed parts.`);return x}}catch{}return null}u.picker.onchange=()=>{let z=u.picker.files?.[0];if(!z)return;f=z;s=load(z);paused=aborted=running=false;xhrs.clear();flight.clear();samples=[];lastB=s?done():0;lastT=performance.now();u.fileName.textContent=z.name;u.fileMeta.textContent=`${fb(z.size)} • ${Math.ceil(z.size/C)} parts • 32 MiB • 2 streams`;u.fileBox.classList.add('show');u.progressCard.classList.add('show');u.start.disabled=false;u.resume.disabled=!s;u.state.textContent=s?'Resume available':'Ready';if(s)draw()};async function create(){let k='source/'+safe(f.name),d=await api(`/multipart/${encodeURIComponent(k)}?action=create`,{method:'POST'});s={version:2,key:k,uploadId:d.uploadId,fileName:f.name,fileSize:f.size,lastModified:f.lastModified,chunkSize:C,parts:{},createdAt:Date.now()};save();log('Multipart session created.')}function put(n,blob){return new Promise((res,rej)=>{let x=new XMLHttpRequest();xhrs.set(n,x);x.open('PUT',`${W}/multipart/${encodeURIComponent(s.key)}?action=part&uploadId=${encodeURIComponent(s.uploadId)}&partNumber=${n}`,true);x.upload.onprogress=e=>{if(e.lengthComputable){flight.set(n,e.loaded);draw()}};x.onload=()=>{xhrs.delete(n);flight.delete(n);let d={};try{d=JSON.parse(x.responseText||'{}')}catch{};x.status>=200&&x.status<300&&d.etag?res(d):rej(Error(d.error||`Part ${n} failed (${x.status})`))};x.onerror=()=>{xhrs.delete(n);flight.delete(n);rej(Error('Network error'))};x.onabort=()=>{xhrs.delete(n);flight.delete(n);rej(new DOMException('Aborted','AbortError'))};x.send(blob)})}async function retry(n,blob){for(let a=1;;a++){if(paused||aborted)throw new DOMException('Stopped','AbortError');try{return await put(n,blob)}catch(e){if(e.name==='AbortError')throw e;if(a>=R)throw e;log(`Part ${n} retry ${a}/${R}.`);while(!navigator.onLine&&!paused&&!aborted)await sleep(1200);await sleep(Math.min(12000,650*2**Math.min(a-1,4)))}}}async function one(n){if(s.parts[n])return;let st=(n-1)*C,blob=f.slice(st,Math.min(f.size,st+C));log(`Uploading part ${n}/${Math.ceil(f.size/C)} (${fb(blob.size)}).`);let d=await retry(n,blob);if(paused||aborted)return;s.parts[n]={partNumber:d.partNumber,etag:d.etag,size:blob.size};save();flight.delete(n);draw();log(`Part ${n} complete.`)}async function run(){if(!f||running)return;running=true;try{if(!s)await create();paused=aborted=false;samples=[];lastB=done();lastT=performance.now();u.start.disabled=true;u.pause.disabled=false;u.resume.disabled=true;u.abort.disabled=false;u.state.textContent='Uploading';let total=Math.ceil(f.size/C),q=[];for(let i=1;i<=total;i++)if(!s.parts[i])q.push(i);let cursor=0,worker=async()=>{while(!paused&&!aborted){let i=cursor++;if(i>=q.length)return;try{await one(q[i])}catch(e){if(e.name==='AbortError')return;throw e}}};await Promise.all(Array.from({length:Math.min(N,q.length||1)},worker));if(aborted)return;if(paused){u.state.textContent='Paused safely';u.pause.disabled=true;u.resume.disabled=false;save();log('Paused safely. Completed parts remain stored in R2.');return}let parts=Object.values(s.parts).map(p=>({partNumber:p.partNumber,etag:p.etag})).sort((a,b)=>a.partNumber-b.partNumber);if(parts.length!==total)throw Error(`Only ${parts.length}/${total} parts complete`);u.state.textContent='Finalizing';let out=await api(`/multipart/${encodeURIComponent(s.key)}?action=complete&uploadId=${encodeURIComponent(s.uploadId)}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({parts})});await sleep(500);let listing=await api('/files?prefix='+encodeURIComponent(s.key)),obj=(listing.objects||[]).find(o=>o.key===s.key);if(!obj||obj.size!==f.size)throw Error('Final size verification failed');u.percent.textContent='100%';u.fill.style.width='100%';u.uploaded.textContent=`${fb(f.size)} / ${fb(f.size)}`;u.state.textContent='Verified complete';u.speed.textContent='Done';u.eta.textContent='0s';u.pause.disabled=u.resume.disabled=u.abort.disabled=true;clear();log(`Verified complete: ${out.key}`);s=null}catch(e){if(e.name!=='AbortError'){u.state.textContent='Error';u.start.disabled=false;u.resume.disabled=!s;log('ERROR: '+e.message)}}finally{running=false}}u.start.onclick=run;u.pause.onclick=()=>{if(!s||paused)return;paused=true;u.state.textContent='Pausing…';for(let x of xhrs.values())try{x.abort()}catch{};save()};u.resume.onclick=async()=>{if(!f||!s)return;while(!navigator.onLine){u.state.textContent='Waiting for network';await sleep(1000)}await test();paused=false;run()};u.abort.onclick=async()=>{if(!s||!confirm('Abort and discard this multipart session?'))return;aborted=true;paused=false;for(let x of xhrs.values())try{x.abort()}catch{};try{await api(`/multipart/${encodeURIComponent(s.key)}?action=abort&uploadId=${encodeURIComponent(s.uploadId)}`,{method:'DELETE'});clear();s=null;u.state.textContent='Aborted';u.start.disabled=false;u.pause.disabled=u.resume.disabled=u.abort.disabled=true;log('Multipart session aborted.')}catch(e){log('Abort failed: '+e.message)}};u.test.onclick=test;addEventListener('online',()=>{test();if(s&&paused)u.state.textContent='Paused safely — R2 online'});addEventListener('offline',()=>{u.connection.textContent='No network';u.connection.className='online bad';if(running&&!paused){u.state.textContent='Waiting for network';log('Network dropped; active parts will retry.')}});document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'&&running)log('Keep this web app foregrounded for the most reliable upload.')});test()})();</script><script>if('serviceWorker'in navigator)addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js?v=11').catch(()=>{}));</script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no" />
+  <meta name="theme-color" content="#0d0f12" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Project V — R2 Uploader</title>
+  <style>
+    :root{color-scheme:dark;--bg:#0d0f12;--card:#171a1f;--card2:#1d2127;--text:#f4f6f8;--muted:#9aa3ad;--line:rgba(255,255,255,.09);--accent:#b7ff43;--accent2:#d8ff9a;--danger:#ff6b6b;--ok:#76e6a2}
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    html,body{margin:0;min-height:100%;background:radial-gradient(circle at 50% -15%,#23282f 0,#111419 38%,var(--bg) 68%);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text",Inter,system-ui,sans-serif;color:var(--text)}
+    body{min-height:100svh;padding:calc(env(safe-area-inset-top) + 18px) 18px calc(env(safe-area-inset-bottom) + 28px);display:flex;justify-content:center}
+    main{width:min(720px,100%)}
+    header{display:flex;align-items:center;justify-content:space-between;margin:8px 2px 24px}
+    .brand{display:flex;gap:13px;align-items:center}.logo{width:48px;height:48px;border-radius:15px;background:linear-gradient(145deg,#f6f8f4,#cfd5cf);color:#0a0c0e;display:grid;place-items:center;font-weight:900;font-size:24px;box-shadow:0 10px 28px rgba(0,0,0,.28)}
+    h1{font-size:22px;line-height:1.05;margin:0}.subtitle{font-size:13px;color:var(--muted);margin-top:4px}.online{font-size:12px;padding:8px 10px;border:1px solid var(--line);border-radius:999px;color:var(--muted);background:rgba(255,255,255,.03)}
+    .online.ok{color:var(--ok)}.online.bad{color:var(--danger)}
+    .card{background:linear-gradient(180deg,rgba(29,33,39,.97),rgba(21,24,29,.97));border:1px solid var(--line);border-radius:26px;padding:20px;box-shadow:0 18px 50px rgba(0,0,0,.26);margin-bottom:16px}
+    .drop{border:1px dashed rgba(255,255,255,.18);border-radius:22px;padding:28px 18px;text-align:center;background:rgba(255,255,255,.025)}
+    .drop strong{display:block;font-size:20px;margin-bottom:8px}.drop p{margin:0 0 18px;color:var(--muted);font-size:14px;line-height:1.45}
+    button,.button{appearance:none;border:0;border-radius:16px;padding:15px 18px;font:inherit;font-weight:750;cursor:pointer}.primary{background:var(--accent);color:#0a0c0e;width:100%}.secondary{background:#272c33;color:var(--text);border:1px solid var(--line)}.danger{background:rgba(255,107,107,.12);color:#ff8a8a;border:1px solid rgba(255,107,107,.2)}button:disabled{opacity:.42;cursor:not-allowed}
+    input[type=file]{display:none}
+    .file{display:none;margin-top:18px;text-align:left;padding:16px;border-radius:18px;background:#12151a;border:1px solid var(--line)}.file.show{display:block}.file-name{font-weight:750;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.file-meta{color:var(--muted);font-size:13px;margin-top:5px}
+    .progress-card{display:none}.progress-card.show{display:block}.row{display:flex;align-items:center;justify-content:space-between;gap:14px}.percent{font-size:42px;font-weight:850;letter-spacing:-1.5px}.state{color:var(--muted);font-size:14px;text-align:right}.bar{height:12px;border-radius:999px;background:#0f1216;overflow:hidden;margin:16px 0 14px;border:1px solid rgba(255,255,255,.05)}.fill{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:inherit;transition:width .15s linear}
+    .stats{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}.stat{padding:13px;border-radius:15px;background:#12151a;border:1px solid var(--line)}.stat span{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.12em;margin-bottom:5px}.stat strong{font-size:15px}
+    .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:15px}.actions .wide{grid-column:1/-1}
+    .note{font-size:12px;line-height:1.5;color:var(--muted);margin:14px 2px 0}.log{max-height:180px;overflow:auto;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:#aab3bc;line-height:1.55;margin-top:14px;padding:12px;background:#0f1216;border-radius:14px;border:1px solid var(--line);white-space:pre-wrap}
+    .badge{display:inline-block;margin-left:6px;padding:2px 7px;border-radius:999px;background:rgba(183,255,67,.1);color:#cfff82;font-size:10px;vertical-align:1px}
+    @media(min-width:650px){body{padding-left:28px;padding-right:28px}.stats{grid-template-columns:repeat(4,1fr)}}
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <div class="brand"><div class="logo">V</div><div><h1>Project V Uploader</h1><div class="subtitle">Private source archive → Cloudflare R2</div></div></div>
+    <div id="connection" class="online">Checking…</div>
+  </header>
+
+  <section class="card">
+    <div class="drop">
+      <strong>Select the GTA archive</strong>
+      <p>The file stays on your device and uploads as resumable 32 MiB parts to <b>projectv/source/</b>. <span class="badge">2 streams</span></p>
+      <label class="button primary" for="picker">Choose .7z file</label>
+      <input id="picker" type="file" accept=".7z,application/x-7z-compressed,application/octet-stream" />
+      <div id="fileBox" class="file"><div id="fileName" class="file-name"></div><div id="fileMeta" class="file-meta"></div></div>
+    </div>
+    <div class="actions">
+      <button id="start" class="primary wide" disabled>Start upload</button>
+      <button id="test" class="secondary wide">Test R2 connection</button>
+    </div>
+    <p class="note">You can pause before changing Wi‑Fi or mobile data. Completed parts are saved locally and are never re-uploaded. After a refresh, reselect the same file and tap Resume.</p>
+  </section>
+
+  <section id="progressCard" class="card progress-card">
+    <div class="row"><div id="percent" class="percent">0%</div><div id="state" class="state">Ready</div></div>
+    <div class="bar"><div id="fill" class="fill"></div></div>
+    <div class="stats">
+      <div class="stat"><span>Uploaded</span><strong id="uploaded">0 B</strong></div>
+      <div class="stat"><span>Speed</span><strong id="speed">—</strong></div>
+      <div class="stat"><span>Part</span><strong id="part">0 / 0</strong></div>
+      <div class="stat"><span>ETA</span><strong id="eta">—</strong></div>
+    </div>
+    <div class="actions">
+      <button id="pause" class="secondary" disabled>Pause</button>
+      <button id="resume" class="secondary" disabled>Resume</button>
+      <button id="abort" class="danger wide" disabled>Abort upload</button>
+    </div>
+    <div id="log" class="log">Waiting.</div>
+  </section>
+</main>
+<script>
+(() => {
+  'use strict';
+
+  const WORKER = 'https://projectv-storage.hrhw55tdmw.workers.dev';
+  const CHUNK_SIZE = 32 * 1024 * 1024;
+  const CONCURRENCY = 2;
+  const MAX_RETRIES = 12;
+
+  const $ = id => document.getElementById(id);
+  const ui = {
+    picker:$('picker'), fileBox:$('fileBox'), fileName:$('fileName'), fileMeta:$('fileMeta'),
+    start:$('start'), test:$('test'), connection:$('connection'), progressCard:$('progressCard'),
+    percent:$('percent'), fill:$('fill'), state:$('state'), uploaded:$('uploaded'), speed:$('speed'),
+    part:$('part'), eta:$('eta'), pause:$('pause'), resume:$('resume'), abort:$('abort'), log:$('log')
+  };
+
+  let file = null;
+  let session = null;
+  let paused = false;
+  let abortRequested = false;
+  let running = false;
+  let activeXHRs = new Map();
+  let inflightBytes = new Map();
+  let speedSamples = [];
+  let lastAggregateTime = performance.now();
+  let lastAggregateBytes = 0;
+
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+  const fmtBytes = n => {
+    if (!Number.isFinite(n) || n <= 0) return '0 B';
+    const u=['B','KB','MB','GB','TB']; let i=0;
+    while(n>=1024&&i<u.length-1){n/=1024;i++;}
+    return `${n.toFixed(i>=3?2:i===2?1:0)} ${u[i]}`;
+  };
+
+  const fmtTime = s => {
+    if (!Number.isFinite(s) || s < 0) return '—';
+    s=Math.round(s);
+    const h=Math.floor(s/3600), m=Math.floor((s%3600)/60), sec=s%60;
+    if(h) return `${h}h ${m}m`;
+    if(m) return `${m}m ${sec}s`;
+    return `${sec}s`;
+  };
+
+  const safeName = name => name
+    .replace(/[\\/]+/g,'_')
+    .replace(/[^a-zA-Z0-9._()\- ]/g,'_')
+    .slice(0,180) || 'archive.7z';
+
+  const sessionKey = f => `projectv:r2:v2:${f.name}:${f.size}:${f.lastModified}`;
+  const legacySessionKey = f => `projectv:r2:${f.name}:${f.size}:${f.lastModified}`;
+
+  const log = msg => {
+    const time=new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    ui.log.textContent=`${time}  ${msg}\n`+ui.log.textContent.slice(0,7000);
+  };
+
+  function save() {
+    if(file && session) {
+      try { localStorage.setItem(sessionKey(file), JSON.stringify(session)); }
+      catch(e) { log(`Warning: could not save resume state (${e.message}).`); }
+    }
+  }
+
+  function clearSaved() {
+    if(!file) return;
+    localStorage.removeItem(sessionKey(file));
+    localStorage.removeItem(legacySessionKey(file));
+  }
+
+  async function api(path, opts={}) {
+    const r = await fetch(WORKER + path, opts);
+    const text = await r.text();
+    let data;
+    try { data = JSON.parse(text); }
+    catch { data = {error:text || `HTTP ${r.status}`}; }
+    if(!r.ok) {
+      const err = new Error(data.error || `HTTP ${r.status}`);
+      err.status = r.status;
+      throw err;
+    }
+    return data;
+  }
+
+  async function testConnection(){
+    ui.connection.textContent='Checking…';
+    ui.connection.className='online';
+    try {
+      const health=await api('/');
+      if(!health.ok||!health.multipart) throw new Error('Multipart API unavailable');
+      await api('/files?prefix=source/');
+      ui.connection.textContent='R2 online';
+      ui.connection.className='online ok';
+      log('Worker and R2 connection OK.');
+      return true;
+    } catch(e){
+      ui.connection.textContent=navigator.onLine?'Offline':'No network';
+      ui.connection.className='online bad';
+      log(`Connection failed: ${e.message}`);
+      return false;
+    }
+  }
+
+  function partSize(partNumber) {
+    const start=(partNumber-1)*CHUNK_SIZE;
+    return Math.max(0, Math.min(CHUNK_SIZE, file.size-start));
+  }
+
+  function completedBytes(){
+    if(!file||!session) return 0;
+    return Object.keys(session.parts||{}).reduce((sum,k)=>sum+partSize(Number(k)),0);
+  }
+
+  function inflightTotal(){
+    let n=0;
+    for(const v of inflightBytes.values()) n+=v;
+    return n;
+  }
+
+  function updateProgress(){
+    if(!file||!session) return;
+    const done=Math.min(file.size, completedBytes()+inflightTotal());
+    const pct=file.size?done/file.size*100:0;
+
+    ui.percent.textContent=`${pct.toFixed(pct>=10?1:2)}%`;
+    ui.fill.style.width=`${pct}%`;
+    ui.uploaded.textContent=`${fmtBytes(done)} / ${fmtBytes(file.size)}`;
+
+    const total=Math.ceil(file.size/CHUNK_SIZE);
+    const finished=Object.keys(session.parts||{}).length;
+    ui.part.textContent=`${finished} / ${total}`;
+
+    const now=performance.now();
+    const dt=(now-lastAggregateTime)/1000;
+    if(dt>=0.6){
+      const delta=Math.max(0,done-lastAggregateBytes);
+      const speed=delta/dt;
+      lastAggregateTime=now;
+      lastAggregateBytes=done;
+      if(speed>0){
+        speedSamples.push(speed);
+        if(speedSamples.length>10) speedSamples.shift();
+        const avg=speedSamples.reduce((a,b)=>a+b,0)/speedSamples.length;
+        ui.speed.textContent=`${fmtBytes(avg)}/s`;
+        ui.eta.textContent=fmtTime((file.size-done)/avg);
+      }
+    }
+  }
+
+  function migrateOrLoadSession(f){
+    let raw=localStorage.getItem(sessionKey(f));
+    if(!raw) raw=localStorage.getItem(legacySessionKey(f));
+    if(!raw) return null;
+    try {
+      const s=JSON.parse(raw);
+      if(s.fileSize===f.size && s.uploadId && s.chunkSize===CHUNK_SIZE){
+        s.version=2;
+        s.parts=s.parts||{};
+        log(`Found resumable session with ${Object.keys(s.parts).length} completed parts.`);
+        return s;
+      }
+    } catch {}
+    return null;
+  }
+
+  ui.picker.addEventListener('change', () => {
+    const f=ui.picker.files?.[0];
+    if(!f) return;
+
+    file=f;
+    session=migrateOrLoadSession(f);
+    paused=false;
+    abortRequested=false;
+    running=false;
+    activeXHRs.clear();
+    inflightBytes.clear();
+    speedSamples=[];
+    lastAggregateBytes=session?completedBytes():0;
+    lastAggregateTime=performance.now();
+
+    ui.fileName.textContent=f.name;
+    ui.fileMeta.textContent=`${fmtBytes(f.size)} • ${Math.ceil(f.size/CHUNK_SIZE)} parts • 32 MiB • 2 parallel streams`;
+    ui.fileBox.classList.add('show');
+    ui.start.disabled=!!session;
+    ui.resume.disabled=!session;
+    ui.pause.disabled=true;
+    ui.abort.disabled=!session;
+    ui.progressCard.classList.add('show');
+    ui.state.textContent=session?'Resume available':'Ready to upload';
+    updateProgress();
+  });
+
+  async function createSession(){
+    const key=`source/${safeName(file.name)}`;
+    const data=await api(`/multipart/${encodeURIComponent(key)}?action=create`,{method:'POST'});
+    session={
+      version:2, key, uploadId:data.uploadId,
+      fileName:file.name, fileSize:file.size, lastModified:file.lastModified,
+      chunkSize:CHUNK_SIZE, parts:{}, createdAt:Date.now()
+    };
+    save();
+    log(`Multipart session created for ${key}.`);
+  }
+
+  function abortActiveRequests(){
+    for(const xhr of activeXHRs.values()){
+      try { xhr.abort(); } catch {}
+    }
+    activeXHRs.clear();
+    inflightBytes.clear();
+    updateProgress();
+  }
+
+  function uploadPartXHR(partNumber, blob){
+    return new Promise((resolve,reject)=>{
+      const xhr=new XMLHttpRequest();
+      activeXHRs.set(partNumber,xhr);
+
+      const url=`${WORKER}/multipart/${encodeURIComponent(session.key)}?action=part&uploadId=${encodeURIComponent(session.uploadId)}&partNumber=${partNumber}`;
+      xhr.open('PUT',url,true);
+      xhr.responseType='text';
+      xhr.timeout=120000;
+
+      xhr.upload.onprogress=e=>{
+        if(e.lengthComputable){
+          inflightBytes.set(partNumber,e.loaded);
+          updateProgress();
+        }
+      };
+
+      const cleanup=()=>{
+        activeXHRs.delete(partNumber);
+        inflightBytes.delete(partNumber);
+        updateProgress();
+      };
+
+      xhr.onload=()=>{
+        let data={};
+        try{data=JSON.parse(xhr.responseText||'{}')}catch{}
+        cleanup();
+        if(xhr.status>=200&&xhr.status<300&&data.etag) resolve(data);
+        else {
+          const err=new Error(data.error||`Part ${partNumber} failed (${xhr.status})`);
+          err.status=xhr.status;
+          reject(err);
+        }
+      };
+
+      xhr.onerror=()=>{ cleanup(); reject(new Error(`Network error on part ${partNumber}`)); };
+      xhr.ontimeout=()=>{ cleanup(); reject(new Error(`Part ${partNumber} timed out`)); };
+      xhr.onabort=()=>{ cleanup(); reject(new DOMException('Aborted','AbortError')); };
+
+      xhr.send(blob);
+    });
+  }
+
+  async function waitForNetwork(){
+    if(navigator.onLine) return;
+    ui.state.textContent='Waiting for network';
+    ui.connection.textContent='No network';
+    ui.connection.className='online bad';
+    log('Network lost. Waiting for connection…');
+    await new Promise(resolve=>{
+      const handler=()=>{
+        window.removeEventListener('online',handler);
+        resolve();
+      };
+      window.addEventListener('online',handler);
+    });
+    log('Network returned. Continuing…');
+    await testConnection();
+  }
+
+  async function uploadWithRetry(partNumber, blob){
+    for(let attempt=1;attempt<=MAX_RETRIES;attempt++){
+      if(paused||abortRequested) throw new DOMException('Stopped','AbortError');
+
+      await waitForNetwork();
+
+      try {
+        return await uploadPartXHR(partNumber,blob);
+      } catch(e){
+        if(e.name==='AbortError') throw e;
+
+        if(e.status===404 && /upload|multipart|not found/i.test(e.message||'')){
+          const stale=new Error('This saved multipart session no longer exists in R2. Abort it locally and start a new upload.');
+          stale.code='STALE_SESSION';
+          throw stale;
+        }
+
+        if(attempt===MAX_RETRIES) throw e;
+
+        const wait=Math.min(15000,800*Math.pow(1.7,attempt-1));
+        log(`Part ${partNumber} interrupted. Retry ${attempt}/${MAX_RETRIES} in ${(wait/1000).toFixed(1)}s.`);
+        ui.state.textContent='Reconnecting…';
+        await sleep(wait);
+      }
+    }
+  }
+
+  async function uploadOnePart(partNumber,total){
+    if(session.parts[partNumber]) return;
+
+    const start=(partNumber-1)*CHUNK_SIZE;
+    const end=Math.min(file.size,start+CHUNK_SIZE);
+    const blob=file.slice(start,end);
+
+    log(`Uploading part ${partNumber}/${total} (${fmtBytes(blob.size)}).`);
+    const result=await uploadWithRetry(partNumber,blob);
+
+    session.parts[partNumber]={
+      partNumber:result.partNumber,
+      etag:result.etag,
+      size:blob.size
+    };
+    save();
+    updateProgress();
+    log(`Part ${partNumber} complete.`);
+  }
+
+  async function parallelUpload(total){
+    const queue=[];
+    for(let n=1;n<=total;n++){
+      if(!session.parts[n]) queue.push(n);
+    }
+
+    let cursor=0;
+    let fatal=null;
+
+    async function workerLoop(){
+      while(true){
+        if(fatal||paused||abortRequested) return;
+        const i=cursor++;
+        if(i>=queue.length) return;
+        const partNumber=queue[i];
+        try{
+          await uploadOnePart(partNumber,total);
+        }catch(e){
+          if(e.name==='AbortError' && (paused||abortRequested)) return;
+          fatal=e;
+          abortActiveRequests();
+          return;
+        }
+      }
+    }
+
+    const workers=[];
+    for(let i=0;i<Math.min(CONCURRENCY,queue.length);i++) workers.push(workerLoop());
+    await Promise.all(workers);
+
+    if(fatal) throw fatal;
+  }
+
+  async function verifyFinalObject(){
+    const listing=await api('/files?prefix=source/');
+    const obj=(listing.objects||[]).find(o=>o.key===session.key);
+    if(!obj) throw new Error('R2 finalized the upload but the object was not found during verification.');
+    if(Number(obj.size)!==Number(file.size)){
+      throw new Error(`Final size mismatch: R2 has ${fmtBytes(obj.size)}, expected ${fmtBytes(file.size)}.`);
+    }
+    log(`Verified final R2 object size: ${fmtBytes(obj.size)}.`);
+  }
+
+  async function runUpload({newSession=false}={}){
+    if(!file||running) return;
+    running=true;
+
+    try{
+      if(newSession || !session) await createSession();
+
+      paused=false;
+      abortRequested=false;
+      speedSamples=[];
+      lastAggregateBytes=completedBytes();
+      lastAggregateTime=performance.now();
+
+      ui.start.disabled=true;
+      ui.pause.disabled=false;
+      ui.resume.disabled=true;
+      ui.abort.disabled=false;
+      ui.state.textContent='Uploading';
+
+      const total=Math.ceil(file.size/CHUNK_SIZE);
+
+      await parallelUpload(total);
+
+      if(abortRequested){
+        ui.state.textContent='Aborting…';
+        return;
+      }
+
+      if(paused){
+        ui.state.textContent='Paused safely';
+        ui.pause.disabled=true;
+        ui.resume.disabled=false;
+        ui.abort.disabled=false;
+        log(`Paused safely with ${Object.keys(session.parts).length}/${total} parts committed to R2.`);
+        return;
+      }
+
+      const parts=Object.values(session.parts)
+        .map(p=>({partNumber:p.partNumber,etag:p.etag}))
+        .sort((a,b)=>a.partNumber-b.partNumber);
+
+      if(parts.length!==total) throw new Error(`Only ${parts.length}/${total} parts are complete.`);
+
+      ui.state.textContent='Finalizing';
+      ui.pause.disabled=true;
+      log('All parts uploaded. Asking R2 to assemble the object…');
+
+      const result=await api(
+        `/multipart/${encodeURIComponent(session.key)}?action=complete&uploadId=${encodeURIComponent(session.uploadId)}`,
+        {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({parts})
+        }
+      );
+
+      inflightBytes.clear();
+      updateProgress();
+      await verifyFinalObject();
+
+      ui.percent.textContent='100%';
+      ui.fill.style.width='100%';
+      ui.uploaded.textContent=`${fmtBytes(file.size)} / ${fmtBytes(file.size)}`;
+      ui.state.textContent='Upload complete';
+      ui.speed.textContent='Done';
+      ui.eta.textContent='0s';
+      ui.pause.disabled=true;
+      ui.resume.disabled=true;
+      ui.abort.disabled=true;
+      clearSaved();
+      log(`Complete: ${result.key} (${fmtBytes(result.size||file.size)}).`);
+      session=null;
+
+    }catch(e){
+      if(e.name==='AbortError' && (paused||abortRequested)){
+        if(paused){
+          ui.state.textContent='Paused safely';
+          ui.pause.disabled=true;
+          ui.resume.disabled=false;
+          ui.abort.disabled=false;
+          log(`Paused safely. Completed parts remain in R2.`);
+        }
+        return;
+      }
+
+      ui.state.textContent=e.code==='STALE_SESSION'?'Session expired':'Error';
+      ui.start.disabled=false;
+      ui.pause.disabled=true;
+      ui.resume.disabled=!session;
+      ui.abort.disabled=!session;
+      log(`ERROR: ${e.message}`);
+    }finally{
+      running=false;
+    }
+  }
+
+  ui.start.addEventListener('click',()=>runUpload({newSession:true}));
+
+  ui.pause.addEventListener('click',()=>{
+    if(!session||!running) return;
+    paused=true;
+    ui.state.textContent='Pausing safely…';
+    ui.pause.disabled=true;
+    abortActiveRequests();
+  });
+
+  ui.resume.addEventListener('click',async()=>{
+    if(!file||!session||running) return;
+    paused=false;
+    abortRequested=false;
+    ui.state.textContent='Checking connection…';
+    const ok=await testConnection();
+    if(!ok && !navigator.onLine){
+      ui.state.textContent='Waiting for network';
+    }
+    runUpload();
+  });
+
+  ui.abort.addEventListener('click',async()=>{
+    if(!session||!confirm('Abort this multipart upload? Completed parts for this session will be discarded.')) return;
+
+    abortRequested=true;
+    paused=false;
+    abortActiveRequests();
+    ui.state.textContent='Aborting';
+
+    try{
+      await api(
+        `/multipart/${encodeURIComponent(session.key)}?action=abort&uploadId=${encodeURIComponent(session.uploadId)}`,
+        {method:'DELETE'}
+      );
+    }catch(e){
+      log(`R2 abort request: ${e.message}`);
+    }
+
+    clearSaved();
+    session=null;
+    inflightBytes.clear();
+    ui.percent.textContent='0%';
+    ui.fill.style.width='0';
+    ui.uploaded.textContent='0 B';
+    ui.part.textContent='0 / 0';
+    ui.speed.textContent='—';
+    ui.eta.textContent='—';
+    ui.state.textContent='Aborted';
+    ui.start.disabled=false;
+    ui.pause.disabled=true;
+    ui.resume.disabled=true;
+    ui.abort.disabled=true;
+    log('Multipart session cleared.');
+  });
+
+  ui.test.addEventListener('click',testConnection);
+
+  window.addEventListener('online',()=>{
+    ui.connection.textContent='Checking…';
+    ui.connection.className='online';
+    testConnection();
+    if(session && paused) log('Network changed/returned. You can safely press Resume.');
+  });
+
+  window.addEventListener('offline',()=>{
+    ui.connection.textContent='No network';
+    ui.connection.className='online bad';
+    if(running && !paused){
+      ui.state.textContent='Waiting for network';
+      log('Network connection dropped. Active parts will retry automatically.');
+    }
+  });
+
+  document.addEventListener('visibilitychange',()=>{
+    if(document.visibilityState==='hidden' && running){
+      log('Safari moved to background. Keep this page foregrounded for the most reliable upload.');
+    }
+  });
+
+  testConnection();
+})();
+</script>
+</body>
+</html>
