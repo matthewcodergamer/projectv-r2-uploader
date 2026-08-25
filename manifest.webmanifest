@@ -1,0 +1,19 @@
+{
+  "name": "Project V Uploader",
+  "short_name": "V Upload",
+  "description": "Resumable Project V archive uploader for Cloudflare R2.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0d0f12",
+  "theme_color": "#0d0f12",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
