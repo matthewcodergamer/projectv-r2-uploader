@@ -9,3 +9,5 @@ Mobile-first multipart uploader for the Project V source archive.
 - Retry handling and final size verification
 - Project V white V + green upload badge used for the page, favicon, and Home Screen/PWA icon
 - Varied original console-style controller UI chimes for tap feedback
+
+Final icon/audio update: final-4.
