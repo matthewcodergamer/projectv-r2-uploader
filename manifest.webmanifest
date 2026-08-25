@@ -1,25 +1,18 @@
 {
+  "id": "./",
   "name": "Project V Uploader",
-  "short_name": "Project V Uploader",
+  "short_name": "Project V",
   "description": "Resumable Project V archive uploader for Cloudflare R2.",
-  "start_url": "./?pwa=final-4",
+  "start_url": "./?pwa=7",
   "scope": "./",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
   "orientation": "portrait",
-  "background_color": "#0c100d",
-  "theme_color": "#111512",
+  "background_color": "#090d0b",
+  "theme_color": "#111713",
   "icons": [
-    {
-      "src": "./apple-touch-icon.png?v=final-4",
-      "sizes": "180x180",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "./brand-icon.svg?v=final-4",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any"
-    }
+    {"src":"./icon-192.png?v=7","sizes":"192x192","type":"image/png","purpose":"any"},
+    {"src":"./icon-512.png?v=7","sizes":"512x512","type":"image/png","purpose":"any"},
+    {"src":"./icon-512.png?v=7","sizes":"512x512","type":"image/png","purpose":"maskable"}
   ]
 }
