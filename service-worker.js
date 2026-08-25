@@ -1,9 +1,7 @@
 const CACHE='project-v-uploader-v7';
 const SHELL=[
   './','./index.html','./manifest.webmanifest','./app-v7.css','./app-v7.js',
-  './favicon-32.png','./favicon.ico',
-  './apple-touch-icon.png','./apple-touch-icon-120.png','./apple-touch-icon-152.png','./apple-touch-icon-167.png',
-  './icon-192.png','./icon-512.png'
+  './favicon-32.png','./apple-touch-icon.png','./icon-192.png','./icon-512.png'
 ];
 self.addEventListener('install',event=>{
   event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(SHELL)).catch(()=>{}));
