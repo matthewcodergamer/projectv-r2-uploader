@@ -1,1 +1,1 @@
-Canonical Project V Uploader icon: white rounded-square V with lime upload-arrow badge, matching the user-provided screenshot. All browser/PWA/in-page branding should reference apple-touch-icon.png.
+Project V Uploader uses one canonical white V + green upload badge icon across the in-page brand, Safari favicon, and iPhone Home Screen/PWA icon. Binary icon assets were rebuilt from the same master artwork.
