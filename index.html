@@ -26,8 +26,8 @@
     .progress-card{display:none}.progress-card.show{display:block}.row{display:flex;align-items:center;justify-content:space-between;gap:14px}.percent{font-size:42px;font-weight:850;letter-spacing:-1.5px}.state{color:var(--muted);font-size:14px;text-align:right}.bar{height:12px;border-radius:999px;background:#0f1216;overflow:hidden;margin:16px 0 14px;border:1px solid rgba(255,255,255,.05)}.fill{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:inherit;transition:width .15s linear}
     .stats{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}.stat{padding:13px;border-radius:15px;background:#12151a;border:1px solid var(--line)}.stat span{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.12em;margin-bottom:5px}.stat strong{font-size:15px}
     .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:15px}.actions .wide{grid-column:1/-1}
-    .note{font-size:12px;line-height:1.5;color:var(--muted);margin:14px 2px 0}.log{max-height:150px;overflow:auto;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:#aab3bc;line-height:1.55;margin-top:14px;padding:12px;background:#0f1216;border-radius:14px;border:1px solid var(--line);white-space:pre-wrap}
-    .hidden{display:none!important}
+    .note{font-size:12px;line-height:1.5;color:var(--muted);margin:14px 2px 0}.log{max-height:180px;overflow:auto;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:#aab3bc;line-height:1.55;margin-top:14px;padding:12px;background:#0f1216;border-radius:14px;border:1px solid var(--line);white-space:pre-wrap}
+    .badge{display:inline-block;margin-left:6px;padding:2px 7px;border-radius:999px;background:rgba(183,255,67,.1);color:#cfff82;font-size:10px;vertical-align:1px}
     @media(min-width:650px){body{padding-left:28px;padding-right:28px}.stats{grid-template-columns:repeat(4,1fr)}}
   </style>
 </head>
@@ -41,7 +41,7 @@
   <section class="card">
     <div class="drop">
       <strong>Select the GTA archive</strong>
-      <p>The file stays on your device and is sliced into 32 MiB parts. Each part uploads separately to <b>projectv/source/</b>.</p>
+      <p>The file stays on your device and uploads as resumable 32 MiB parts to <b>projectv/source/</b>. <span class="badge">2 streams</span></p>
       <label class="button primary" for="picker">Choose .7z file</label>
       <input id="picker" type="file" accept=".7z,application/x-7z-compressed,application/octet-stream" />
       <div id="fileBox" class="file"><div id="fileName" class="file-name"></div><div id="fileMeta" class="file-meta"></div></div>
@@ -50,7 +50,7 @@
       <button id="start" class="primary wide" disabled>Start upload</button>
       <button id="test" class="secondary wide">Test R2 connection</button>
     </div>
-    <p class="note">Keep Safari open while uploading. If the page refreshes, select the same file again and this page will restore completed multipart pieces stored on this device.</p>
+    <p class="note">You can pause before changing Wi‑Fi or mobile data. Completed parts are saved locally and are never re-uploaded. After a refresh, reselect the same file and tap Resume.</p>
   </section>
 
   <section id="progressCard" class="card progress-card">
@@ -73,20 +73,32 @@
 <script>
 (() => {
   'use strict';
+
   const WORKER = 'https://projectv-storage.hrhw55tdmw.workers.dev';
   const CHUNK_SIZE = 32 * 1024 * 1024;
-  const MAX_RETRIES = 5;
+  const CONCURRENCY = 2;
+  const MAX_RETRIES = 12;
 
   const $ = id => document.getElementById(id);
-  const ui = {picker:$('picker'),fileBox:$('fileBox'),fileName:$('fileName'),fileMeta:$('fileMeta'),start:$('start'),test:$('test'),connection:$('connection'),progressCard:$('progressCard'),percent:$('percent'),fill:$('fill'),state:$('state'),uploaded:$('uploaded'),speed:$('speed'),part:$('part'),eta:$('eta'),pause:$('pause'),resume:$('resume'),abort:$('abort'),log:$('log')};
+  const ui = {
+    picker:$('picker'), fileBox:$('fileBox'), fileName:$('fileName'), fileMeta:$('fileMeta'),
+    start:$('start'), test:$('test'), connection:$('connection'), progressCard:$('progressCard'),
+    percent:$('percent'), fill:$('fill'), state:$('state'), uploaded:$('uploaded'), speed:$('speed'),
+    part:$('part'), eta:$('eta'), pause:$('pause'), resume:$('resume'), abort:$('abort'), log:$('log')
+  };
 
   let file = null;
   let session = null;
   let paused = false;
   let abortRequested = false;
-  let activeXHR = null;
-  let currentBaseBytes = 0;
+  let running = false;
+  let activeXHRs = new Map();
+  let inflightBytes = new Map();
   let speedSamples = [];
+  let lastAggregateTime = performance.now();
+  let lastAggregateBytes = 0;
+
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
 
   const fmtBytes = n => {
     if (!Number.isFinite(n) || n <= 0) return '0 B';
@@ -94,127 +106,511 @@
     while(n>=1024&&i<u.length-1){n/=1024;i++;}
     return `${n.toFixed(i>=3?2:i===2?1:0)} ${u[i]}`;
   };
+
   const fmtTime = s => {
     if (!Number.isFinite(s) || s < 0) return '—';
-    s=Math.round(s); const h=Math.floor(s/3600), m=Math.floor((s%3600)/60), sec=s%60;
-    if(h) return `${h}h ${m}m`; if(m) return `${m}m ${sec}s`; return `${sec}s`;
+    s=Math.round(s);
+    const h=Math.floor(s/3600), m=Math.floor((s%3600)/60), sec=s%60;
+    if(h) return `${h}h ${m}m`;
+    if(m) return `${m}m ${sec}s`;
+    return `${sec}s`;
   };
-  const safeName = name => name.replace(/[\\/]+/g,'_').replace(/[^a-zA-Z0-9._()\- ]/g,'_').slice(0,180) || 'archive.7z';
-  const sessionKey = f => `projectv:r2:${f.name}:${f.size}:${f.lastModified}`;
-  const log = msg => { const time=new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'}); ui.log.textContent=`${time}  ${msg}\n`+ui.log.textContent.slice(0,5000); };
-  const save = () => { if(file&&session) localStorage.setItem(sessionKey(file), JSON.stringify(session)); };
-  const clearSaved = () => { if(file) localStorage.removeItem(sessionKey(file)); };
+
+  const safeName = name => name
+    .replace(/[\\/]+/g,'_')
+    .replace(/[^a-zA-Z0-9._()\- ]/g,'_')
+    .slice(0,180) || 'archive.7z';
+
+  const sessionKey = f => `projectv:r2:v2:${f.name}:${f.size}:${f.lastModified}`;
+  const legacySessionKey = f => `projectv:r2:${f.name}:${f.size}:${f.lastModified}`;
+
+  const log = msg => {
+    const time=new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    ui.log.textContent=`${time}  ${msg}\n`+ui.log.textContent.slice(0,7000);
+  };
+
+  function save() {
+    if(file && session) {
+      try { localStorage.setItem(sessionKey(file), JSON.stringify(session)); }
+      catch(e) { log(`Warning: could not save resume state (${e.message}).`); }
+    }
+  }
+
+  function clearSaved() {
+    if(!file) return;
+    localStorage.removeItem(sessionKey(file));
+    localStorage.removeItem(legacySessionKey(file));
+  }
 
   async function api(path, opts={}) {
     const r = await fetch(WORKER + path, opts);
-    const text = await r.text(); let data;
-    try { data = JSON.parse(text); } catch { data = {error:text || `HTTP ${r.status}`}; }
-    if(!r.ok) throw new Error(data.error || `HTTP ${r.status}`);
+    const text = await r.text();
+    let data;
+    try { data = JSON.parse(text); }
+    catch { data = {error:text || `HTTP ${r.status}`}; }
+    if(!r.ok) {
+      const err = new Error(data.error || `HTTP ${r.status}`);
+      err.status = r.status;
+      throw err;
+    }
     return data;
   }
 
   async function testConnection(){
-    ui.connection.textContent='Checking…'; ui.connection.className='online';
+    ui.connection.textContent='Checking…';
+    ui.connection.className='online';
     try {
       const health=await api('/');
       if(!health.ok||!health.multipart) throw new Error('Multipart API unavailable');
       await api('/files?prefix=source/');
-      ui.connection.textContent='R2 online'; ui.connection.className='online ok'; log('Worker and R2 connection OK.');
-    } catch(e){ ui.connection.textContent='Offline'; ui.connection.className='online bad'; log(`Connection failed: ${e.message}`); }
+      ui.connection.textContent='R2 online';
+      ui.connection.className='online ok';
+      log('Worker and R2 connection OK.');
+      return true;
+    } catch(e){
+      ui.connection.textContent=navigator.onLine?'Offline':'No network';
+      ui.connection.className='online bad';
+      log(`Connection failed: ${e.message}`);
+      return false;
+    }
+  }
+
+  function partSize(partNumber) {
+    const start=(partNumber-1)*CHUNK_SIZE;
+    return Math.max(0, Math.min(CHUNK_SIZE, file.size-start));
   }
 
   function completedBytes(){
     if(!file||!session) return 0;
-    return Object.keys(session.parts||{}).reduce((sum,k)=>{
-      const idx=Number(k)-1; const start=idx*CHUNK_SIZE; return sum+Math.min(CHUNK_SIZE,file.size-start);
-    },0);
+    return Object.keys(session.parts||{}).reduce((sum,k)=>sum+partSize(Number(k)),0);
   }
 
-  function updateProgress(extra=0, instantSpeed=0){
+  function inflightTotal(){
+    let n=0;
+    for(const v of inflightBytes.values()) n+=v;
+    return n;
+  }
+
+  function updateProgress(){
     if(!file||!session) return;
-    const done=Math.min(file.size,currentBaseBytes+extra); const pct=file.size?done/file.size*100:0;
-    ui.percent.textContent=`${pct.toFixed(pct>=10?1:2)}%`; ui.fill.style.width=`${pct}%`; ui.uploaded.textContent=`${fmtBytes(done)} / ${fmtBytes(file.size)}`;
-    const total=Math.ceil(file.size/CHUNK_SIZE); const finished=Object.keys(session.parts||{}).length; ui.part.textContent=`${Math.min(total,finished+(extra>0?1:0))} / ${total}`;
-    if(instantSpeed>0){ speedSamples.push(instantSpeed); if(speedSamples.length>8)speedSamples.shift(); const avg=speedSamples.reduce((a,b)=>a+b,0)/speedSamples.length; ui.speed.textContent=`${fmtBytes(avg)}/s`; ui.eta.textContent=fmtTime((file.size-done)/avg); }
+    const done=Math.min(file.size, completedBytes()+inflightTotal());
+    const pct=file.size?done/file.size*100:0;
+
+    ui.percent.textContent=`${pct.toFixed(pct>=10?1:2)}%`;
+    ui.fill.style.width=`${pct}%`;
+    ui.uploaded.textContent=`${fmtBytes(done)} / ${fmtBytes(file.size)}`;
+
+    const total=Math.ceil(file.size/CHUNK_SIZE);
+    const finished=Object.keys(session.parts||{}).length;
+    ui.part.textContent=`${finished} / ${total}`;
+
+    const now=performance.now();
+    const dt=(now-lastAggregateTime)/1000;
+    if(dt>=0.6){
+      const delta=Math.max(0,done-lastAggregateBytes);
+      const speed=delta/dt;
+      lastAggregateTime=now;
+      lastAggregateBytes=done;
+      if(speed>0){
+        speedSamples.push(speed);
+        if(speedSamples.length>10) speedSamples.shift();
+        const avg=speedSamples.reduce((a,b)=>a+b,0)/speedSamples.length;
+        ui.speed.textContent=`${fmtBytes(avg)}/s`;
+        ui.eta.textContent=fmtTime((file.size-done)/avg);
+      }
+    }
   }
 
-  function loadOrCreateLocalSession(f){
-    const raw=localStorage.getItem(sessionKey(f));
-    if(raw){ try { const s=JSON.parse(raw); if(s.fileSize===f.size&&s.chunkSize===CHUNK_SIZE&&s.uploadId){ log(`Found resumable session with ${Object.keys(s.parts||{}).length} completed parts.`); return s; } }catch{} }
+  function migrateOrLoadSession(f){
+    let raw=localStorage.getItem(sessionKey(f));
+    if(!raw) raw=localStorage.getItem(legacySessionKey(f));
+    if(!raw) return null;
+    try {
+      const s=JSON.parse(raw);
+      if(s.fileSize===f.size && s.uploadId && s.chunkSize===CHUNK_SIZE){
+        s.version=2;
+        s.parts=s.parts||{};
+        log(`Found resumable session with ${Object.keys(s.parts).length} completed parts.`);
+        return s;
+      }
+    } catch {}
     return null;
   }
 
   ui.picker.addEventListener('change', () => {
-    const f=ui.picker.files?.[0]; if(!f)return;
-    file=f; session=loadOrCreateLocalSession(f); paused=false; abortRequested=false;
-    ui.fileName.textContent=f.name; ui.fileMeta.textContent=`${fmtBytes(f.size)} • ${Math.ceil(f.size/CHUNK_SIZE)} parts • 32 MiB each`; ui.fileBox.classList.add('show'); ui.start.disabled=false; ui.progressCard.classList.add('show');
-    currentBaseBytes=session?completedBytes():0; updateProgress(); ui.state.textContent=session?'Resume available':'Ready to upload';
+    const f=ui.picker.files?.[0];
+    if(!f) return;
+
+    file=f;
+    session=migrateOrLoadSession(f);
+    paused=false;
+    abortRequested=false;
+    running=false;
+    activeXHRs.clear();
+    inflightBytes.clear();
+    speedSamples=[];
+    lastAggregateBytes=session?completedBytes():0;
+    lastAggregateTime=performance.now();
+
+    ui.fileName.textContent=f.name;
+    ui.fileMeta.textContent=`${fmtBytes(f.size)} • ${Math.ceil(f.size/CHUNK_SIZE)} parts • 32 MiB • 2 parallel streams`;
+    ui.fileBox.classList.add('show');
+    ui.start.disabled=!!session;
+    ui.resume.disabled=!session;
+    ui.pause.disabled=true;
+    ui.abort.disabled=!session;
+    ui.progressCard.classList.add('show');
+    ui.state.textContent=session?'Resume available':'Ready to upload';
+    updateProgress();
   });
 
   async function createSession(){
     const key=`source/${safeName(file.name)}`;
     const data=await api(`/multipart/${encodeURIComponent(key)}?action=create`,{method:'POST'});
-    session={version:1,key,uploadId:data.uploadId,fileName:file.name,fileSize:file.size,lastModified:file.lastModified,chunkSize:CHUNK_SIZE,parts:{},createdAt:Date.now()}; save(); log(`Multipart session created for ${key}.`);
+    session={
+      version:2, key, uploadId:data.uploadId,
+      fileName:file.name, fileSize:file.size, lastModified:file.lastModified,
+      chunkSize:CHUNK_SIZE, parts:{}, createdAt:Date.now()
+    };
+    save();
+    log(`Multipart session created for ${key}.`);
   }
 
-  function uploadPartXHR(partNumber, blob, onProgress){
+  function abortActiveRequests(){
+    for(const xhr of activeXHRs.values()){
+      try { xhr.abort(); } catch {}
+    }
+    activeXHRs.clear();
+    inflightBytes.clear();
+    updateProgress();
+  }
+
+  function uploadPartXHR(partNumber, blob){
     return new Promise((resolve,reject)=>{
-      const xhr=new XMLHttpRequest(); activeXHR=xhr;
+      const xhr=new XMLHttpRequest();
+      activeXHRs.set(partNumber,xhr);
+
       const url=`${WORKER}/multipart/${encodeURIComponent(session.key)}?action=part&uploadId=${encodeURIComponent(session.uploadId)}&partNumber=${partNumber}`;
-      xhr.open('PUT',url,true); xhr.responseType='text';
-      let lastT=performance.now(), lastLoaded=0;
-      xhr.upload.onprogress=e=>{ if(!e.lengthComputable)return; const now=performance.now(), dt=(now-lastT)/1000; if(dt>=.35){ const speed=(e.loaded-lastLoaded)/dt; lastT=now; lastLoaded=e.loaded; onProgress(e.loaded,speed); } else onProgress(e.loaded,0); };
-      xhr.onload=()=>{ activeXHR=null; let data={}; try{data=JSON.parse(xhr.responseText||'{}')}catch{}; if(xhr.status>=200&&xhr.status<300&&data.etag) resolve(data); else reject(new Error(data.error||`Part ${partNumber} failed (${xhr.status})`)); };
-      xhr.onerror=()=>{activeXHR=null;reject(new Error(`Network error on part ${partNumber}`));}; xhr.onabort=()=>{activeXHR=null;reject(new DOMException('Aborted','AbortError'));}; xhr.send(blob);
+      xhr.open('PUT',url,true);
+      xhr.responseType='text';
+      xhr.timeout=120000;
+
+      xhr.upload.onprogress=e=>{
+        if(e.lengthComputable){
+          inflightBytes.set(partNumber,e.loaded);
+          updateProgress();
+        }
+      };
+
+      const cleanup=()=>{
+        activeXHRs.delete(partNumber);
+        inflightBytes.delete(partNumber);
+        updateProgress();
+      };
+
+      xhr.onload=()=>{
+        let data={};
+        try{data=JSON.parse(xhr.responseText||'{}')}catch{}
+        cleanup();
+        if(xhr.status>=200&&xhr.status<300&&data.etag) resolve(data);
+        else {
+          const err=new Error(data.error||`Part ${partNumber} failed (${xhr.status})`);
+          err.status=xhr.status;
+          reject(err);
+        }
+      };
+
+      xhr.onerror=()=>{ cleanup(); reject(new Error(`Network error on part ${partNumber}`)); };
+      xhr.ontimeout=()=>{ cleanup(); reject(new Error(`Part ${partNumber} timed out`)); };
+      xhr.onabort=()=>{ cleanup(); reject(new DOMException('Aborted','AbortError')); };
+
+      xhr.send(blob);
     });
+  }
+
+  async function waitForNetwork(){
+    if(navigator.onLine) return;
+    ui.state.textContent='Waiting for network';
+    ui.connection.textContent='No network';
+    ui.connection.className='online bad';
+    log('Network lost. Waiting for connection…');
+    await new Promise(resolve=>{
+      const handler=()=>{
+        window.removeEventListener('online',handler);
+        resolve();
+      };
+      window.addEventListener('online',handler);
+    });
+    log('Network returned. Continuing…');
+    await testConnection();
   }
 
   async function uploadWithRetry(partNumber, blob){
     for(let attempt=1;attempt<=MAX_RETRIES;attempt++){
-      if(paused||abortRequested) throw new DOMException('Paused','AbortError');
-      try { return await uploadPartXHR(partNumber,blob,(loaded,speed)=>updateProgress(loaded,speed)); }
-      catch(e){ if(e.name==='AbortError') throw e; if(attempt===MAX_RETRIES) throw e; const wait=Math.min(12000,700*Math.pow(2,attempt-1)); log(`Part ${partNumber} failed. Retry ${attempt}/${MAX_RETRIES} in ${(wait/1000).toFixed(1)}s.`); await new Promise(r=>setTimeout(r,wait)); }
-    }
-  }
+      if(paused||abortRequested) throw new DOMException('Stopped','AbortError');
 
-  async function runUpload(){
-    if(!file)return;
-    try{
-      if(!session) await createSession();
-      paused=false; abortRequested=false; speedSamples=[]; ui.start.disabled=true; ui.pause.disabled=false; ui.resume.disabled=true; ui.abort.disabled=false; ui.state.textContent='Uploading';
-      const total=Math.ceil(file.size/CHUNK_SIZE);
-      for(let partNumber=1;partNumber<=total;partNumber++){
-        if(paused||abortRequested) break;
-        if(session.parts[partNumber]){ currentBaseBytes=completedBytes(); updateProgress(); continue; }
-        const start=(partNumber-1)*CHUNK_SIZE, end=Math.min(file.size,start+CHUNK_SIZE), blob=file.slice(start,end);
-        currentBaseBytes=completedBytes(); ui.part.textContent=`${partNumber} / ${total}`; log(`Uploading part ${partNumber}/${total} (${fmtBytes(blob.size)}).`);
-        const result=await uploadWithRetry(partNumber,blob);
-        session.parts[partNumber]={partNumber:result.partNumber,etag:result.etag,size:blob.size}; save(); currentBaseBytes=completedBytes(); updateProgress(); log(`Part ${partNumber} complete.`);
+      await waitForNetwork();
+
+      try {
+        return await uploadPartXHR(partNumber,blob);
+      } catch(e){
+        if(e.name==='AbortError') throw e;
+
+        if(e.status===404 && /upload|multipart|not found/i.test(e.message||'')){
+          const stale=new Error('This saved multipart session no longer exists in R2. Abort it locally and start a new upload.');
+          stale.code='STALE_SESSION';
+          throw stale;
+        }
+
+        if(attempt===MAX_RETRIES) throw e;
+
+        const wait=Math.min(15000,800*Math.pow(1.7,attempt-1));
+        log(`Part ${partNumber} interrupted. Retry ${attempt}/${MAX_RETRIES} in ${(wait/1000).toFixed(1)}s.`);
+        ui.state.textContent='Reconnecting…';
+        await sleep(wait);
       }
-      if(abortRequested) return;
-      if(paused){ ui.state.textContent='Paused'; ui.pause.disabled=true; ui.resume.disabled=false; log('Upload paused.'); return; }
-      const parts=Object.values(session.parts).map(p=>({partNumber:p.partNumber,etag:p.etag})).sort((a,b)=>a.partNumber-b.partNumber);
-      if(parts.length!==total) throw new Error(`Only ${parts.length}/${total} parts are complete.`);
-      ui.state.textContent='Finalizing'; log('All parts uploaded. Asking R2 to assemble the object…');
-      const result=await api(`/multipart/${encodeURIComponent(session.key)}?action=complete&uploadId=${encodeURIComponent(session.uploadId)}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({parts})});
-      currentBaseBytes=file.size; updateProgress(); ui.percent.textContent='100%'; ui.fill.style.width='100%'; ui.state.textContent='Upload complete'; ui.speed.textContent='Done'; ui.eta.textContent='0s'; ui.pause.disabled=true; ui.resume.disabled=true; ui.abort.disabled=true; clearSaved(); log(`Complete: ${result.key} (${fmtBytes(result.size||file.size)}).`); session=null;
-    }catch(e){
-      if(e.name==='AbortError'){ if(!paused&&!abortRequested) log('Current request stopped.'); return; }
-      ui.state.textContent='Error'; ui.start.disabled=false; ui.pause.disabled=true; ui.resume.disabled=false; log(`ERROR: ${e.message}`);
     }
   }
 
-  ui.start.addEventListener('click',runUpload);
-  ui.pause.addEventListener('click',()=>{ if(!session)return; paused=true; if(activeXHR)activeXHR.abort(); ui.state.textContent='Pausing…'; });
-  ui.resume.addEventListener('click',()=>{ if(!file||!session)return; paused=false; runUpload(); });
-  ui.abort.addEventListener('click',async()=>{
-    if(!session||!confirm('Abort this multipart upload? Completed parts for this session will be discarded.'))return;
-    abortRequested=true; paused=false; if(activeXHR)activeXHR.abort(); ui.state.textContent='Aborting';
-    try{ await api(`/multipart/${encodeURIComponent(session.key)}?action=abort&uploadId=${encodeURIComponent(session.uploadId)}`,{method:'DELETE'}); clearSaved(); session=null; currentBaseBytes=0; updateProgress(); ui.percent.textContent='0%'; ui.fill.style.width='0'; ui.state.textContent='Aborted'; ui.start.disabled=false; ui.pause.disabled=true; ui.resume.disabled=true; ui.abort.disabled=true; log('Multipart upload aborted in R2.'); }catch(e){log(`Abort failed: ${e.message}`);}
+  async function uploadOnePart(partNumber,total){
+    if(session.parts[partNumber]) return;
+
+    const start=(partNumber-1)*CHUNK_SIZE;
+    const end=Math.min(file.size,start+CHUNK_SIZE);
+    const blob=file.slice(start,end);
+
+    log(`Uploading part ${partNumber}/${total} (${fmtBytes(blob.size)}).`);
+    const result=await uploadWithRetry(partNumber,blob);
+
+    session.parts[partNumber]={
+      partNumber:result.partNumber,
+      etag:result.etag,
+      size:blob.size
+    };
+    save();
+    updateProgress();
+    log(`Part ${partNumber} complete.`);
+  }
+
+  async function parallelUpload(total){
+    const queue=[];
+    for(let n=1;n<=total;n++){
+      if(!session.parts[n]) queue.push(n);
+    }
+
+    let cursor=0;
+    let fatal=null;
+
+    async function workerLoop(){
+      while(true){
+        if(fatal||paused||abortRequested) return;
+        const i=cursor++;
+        if(i>=queue.length) return;
+        const partNumber=queue[i];
+        try{
+          await uploadOnePart(partNumber,total);
+        }catch(e){
+          if(e.name==='AbortError' && (paused||abortRequested)) return;
+          fatal=e;
+          abortActiveRequests();
+          return;
+        }
+      }
+    }
+
+    const workers=[];
+    for(let i=0;i<Math.min(CONCURRENCY,queue.length);i++) workers.push(workerLoop());
+    await Promise.all(workers);
+
+    if(fatal) throw fatal;
+  }
+
+  async function verifyFinalObject(){
+    const listing=await api('/files?prefix=source/');
+    const obj=(listing.objects||[]).find(o=>o.key===session.key);
+    if(!obj) throw new Error('R2 finalized the upload but the object was not found during verification.');
+    if(Number(obj.size)!==Number(file.size)){
+      throw new Error(`Final size mismatch: R2 has ${fmtBytes(obj.size)}, expected ${fmtBytes(file.size)}.`);
+    }
+    log(`Verified final R2 object size: ${fmtBytes(obj.size)}.`);
+  }
+
+  async function runUpload({newSession=false}={}){
+    if(!file||running) return;
+    running=true;
+
+    try{
+      if(newSession || !session) await createSession();
+
+      paused=false;
+      abortRequested=false;
+      speedSamples=[];
+      lastAggregateBytes=completedBytes();
+      lastAggregateTime=performance.now();
+
+      ui.start.disabled=true;
+      ui.pause.disabled=false;
+      ui.resume.disabled=true;
+      ui.abort.disabled=false;
+      ui.state.textContent='Uploading';
+
+      const total=Math.ceil(file.size/CHUNK_SIZE);
+
+      await parallelUpload(total);
+
+      if(abortRequested){
+        ui.state.textContent='Aborting…';
+        return;
+      }
+
+      if(paused){
+        ui.state.textContent='Paused safely';
+        ui.pause.disabled=true;
+        ui.resume.disabled=false;
+        ui.abort.disabled=false;
+        log(`Paused safely with ${Object.keys(session.parts).length}/${total} parts committed to R2.`);
+        return;
+      }
+
+      const parts=Object.values(session.parts)
+        .map(p=>({partNumber:p.partNumber,etag:p.etag}))
+        .sort((a,b)=>a.partNumber-b.partNumber);
+
+      if(parts.length!==total) throw new Error(`Only ${parts.length}/${total} parts are complete.`);
+
+      ui.state.textContent='Finalizing';
+      ui.pause.disabled=true;
+      log('All parts uploaded. Asking R2 to assemble the object…');
+
+      const result=await api(
+        `/multipart/${encodeURIComponent(session.key)}?action=complete&uploadId=${encodeURIComponent(session.uploadId)}`,
+        {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({parts})
+        }
+      );
+
+      inflightBytes.clear();
+      updateProgress();
+      await verifyFinalObject();
+
+      ui.percent.textContent='100%';
+      ui.fill.style.width='100%';
+      ui.uploaded.textContent=`${fmtBytes(file.size)} / ${fmtBytes(file.size)}`;
+      ui.state.textContent='Upload complete';
+      ui.speed.textContent='Done';
+      ui.eta.textContent='0s';
+      ui.pause.disabled=true;
+      ui.resume.disabled=true;
+      ui.abort.disabled=true;
+      clearSaved();
+      log(`Complete: ${result.key} (${fmtBytes(result.size||file.size)}).`);
+      session=null;
+
+    }catch(e){
+      if(e.name==='AbortError' && (paused||abortRequested)){
+        if(paused){
+          ui.state.textContent='Paused safely';
+          ui.pause.disabled=true;
+          ui.resume.disabled=false;
+          ui.abort.disabled=false;
+          log(`Paused safely. Completed parts remain in R2.`);
+        }
+        return;
+      }
+
+      ui.state.textContent=e.code==='STALE_SESSION'?'Session expired':'Error';
+      ui.start.disabled=false;
+      ui.pause.disabled=true;
+      ui.resume.disabled=!session;
+      ui.abort.disabled=!session;
+      log(`ERROR: ${e.message}`);
+    }finally{
+      running=false;
+    }
+  }
+
+  ui.start.addEventListener('click',()=>runUpload({newSession:true}));
+
+  ui.pause.addEventListener('click',()=>{
+    if(!session||!running) return;
+    paused=true;
+    ui.state.textContent='Pausing safely…';
+    ui.pause.disabled=true;
+    abortActiveRequests();
   });
+
+  ui.resume.addEventListener('click',async()=>{
+    if(!file||!session||running) return;
+    paused=false;
+    abortRequested=false;
+    ui.state.textContent='Checking connection…';
+    const ok=await testConnection();
+    if(!ok && !navigator.onLine){
+      ui.state.textContent='Waiting for network';
+    }
+    runUpload();
+  });
+
+  ui.abort.addEventListener('click',async()=>{
+    if(!session||!confirm('Abort this multipart upload? Completed parts for this session will be discarded.')) return;
+
+    abortRequested=true;
+    paused=false;
+    abortActiveRequests();
+    ui.state.textContent='Aborting';
+
+    try{
+      await api(
+        `/multipart/${encodeURIComponent(session.key)}?action=abort&uploadId=${encodeURIComponent(session.uploadId)}`,
+        {method:'DELETE'}
+      );
+    }catch(e){
+      log(`R2 abort request: ${e.message}`);
+    }
+
+    clearSaved();
+    session=null;
+    inflightBytes.clear();
+    ui.percent.textContent='0%';
+    ui.fill.style.width='0';
+    ui.uploaded.textContent='0 B';
+    ui.part.textContent='0 / 0';
+    ui.speed.textContent='—';
+    ui.eta.textContent='—';
+    ui.state.textContent='Aborted';
+    ui.start.disabled=false;
+    ui.pause.disabled=true;
+    ui.resume.disabled=true;
+    ui.abort.disabled=true;
+    log('Multipart session cleared.');
+  });
+
   ui.test.addEventListener('click',testConnection);
-  window.addEventListener('online',testConnection);
-  window.addEventListener('offline',()=>{ui.connection.textContent='No network';ui.connection.className='online bad';});
+
+  window.addEventListener('online',()=>{
+    ui.connection.textContent='Checking…';
+    ui.connection.className='online';
+    testConnection();
+    if(session && paused) log('Network changed/returned. You can safely press Resume.');
+  });
+
+  window.addEventListener('offline',()=>{
+    ui.connection.textContent='No network';
+    ui.connection.className='online bad';
+    if(running && !paused){
+      ui.state.textContent='Waiting for network';
+      log('Network connection dropped. Active parts will retry automatically.');
+    }
+  });
+
+  document.addEventListener('visibilitychange',()=>{
+    if(document.visibilityState==='hidden' && running){
+      log('Safari moved to background. Keep this page foregrounded for the most reliable upload.');
+    }
+  });
+
   testConnection();
 })();
 </script>
