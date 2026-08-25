@@ -2,7 +2,7 @@
   "name": "Project V Uploader",
   "short_name": "Project V Uploader",
   "description": "Resumable Project V archive uploader for Cloudflare R2.",
-  "start_url": "./?pwa=final-2",
+  "start_url": "./?pwa=final-4",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
@@ -10,10 +10,16 @@
   "theme_color": "#111512",
   "icons": [
     {
-      "src": "./icon-192.png?v=final-2",
-      "sizes": "192x192",
+      "src": "./apple-touch-icon.png?v=final-4",
+      "sizes": "180x180",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "./brand-icon.svg?v=final-4",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
     }
   ]
 }
