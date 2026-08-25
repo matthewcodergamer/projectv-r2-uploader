@@ -1,1 +1,1 @@
-Project V Uploader uses one canonical white V + green upload badge icon across the in-page brand, Safari favicon, and iPhone Home Screen/PWA icon. Binary icon assets were rebuilt from the same master artwork.
+Project V Uploader uses one canonical white V + green upload badge icon across the in-page brand, Safari favicon, and iPhone Home Screen/PWA icon. The binary favicon and apple-touch icon assets were rebuilt from that same master artwork and cache-busted through final-4.
