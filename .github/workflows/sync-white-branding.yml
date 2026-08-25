@@ -1,0 +1,91 @@
+name: Sync white Project V branding
+
+on:
+  push:
+    paths:
+      - '.brand-sync-trigger'
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate one cohesive white icon family
+        run: |
+          python3 -m pip install --quiet pillow
+          python3 - <<'PY'
+          from PIL import Image, ImageDraw
+          from pathlib import Path
+          import json, re
+
+          VERSION='11'
+
+          def icon(size, path):
+              S=1024
+              im=Image.new('RGBA',(S,S),(0,0,0,0))
+              d=ImageDraw.Draw(im)
+              d.rounded_rectangle((48,48,976,976), radius=200, fill='#F1F1EA', outline='#10120F', width=30)
+              d.rounded_rectangle((72,72,952,952), radius=176, outline='#596050', width=8)
+              d.polygon([(250,220),(410,220),(512,610),(614,220),(774,220),(585,800),(439,800)], fill='#0D0F0C')
+              d.ellipse((650,650,940,940), fill='#9DCC55', outline='#10120F', width=30)
+              d.polygon([(795,705),(690,810),(750,810),(750,885),(840,885),(840,810),(900,810)], fill='#10120F')
+              im.resize((size,size),Image.Resampling.LANCZOS).save(path,'PNG',optimize=True)
+
+          for size,name in [(32,'favicon-32.png'),(180,'apple-touch-icon.png'),(192,'icon-192.png'),(512,'icon-512.png')]:
+              icon(size,name)
+
+          Path('brand-icon.svg').write_text('''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024"><rect x="48" y="48" width="928" height="928" rx="200" fill="#F1F1EA" stroke="#10120F" stroke-width="30"/><rect x="72" y="72" width="880" height="880" rx="176" fill="none" stroke="#596050" stroke-width="8"/><path d="M250 220h160l102 390 102-390h160L585 800H439L250 220Z" fill="#0D0F0C"/><circle cx="795" cy="795" r="145" fill="#9DCC55" stroke="#10120F" stroke-width="30"/><path d="M795 705L690 810h60v75h90v-75h60L795 705Z" fill="#10120F"/></svg>''')
+
+          p=Path('index.html')
+          s=p.read_text()
+          s=re.sub(r'<meta name="apple-mobile-web-app-title" content="[^"]*"\s*/?>','<meta name="apple-mobile-web-app-title" content="Project V Uploader" />',s)
+          s=re.sub(r'<meta name="application-name" content="[^"]*"\s*/?>','<meta name="application-name" content="Project V Uploader" />',s)
+          s=re.sub(r'<link rel="manifest"[^>]*>','<link rel="manifest" href="./manifest.webmanifest?v='+VERSION+'" />',s)
+          s=re.sub(r'<link rel="icon"[^>]*sizes="32x32"[^>]*>','<link rel="icon" type="image/png" sizes="32x32" href="./favicon-32.png?v='+VERSION+'" />',s)
+          s=re.sub(r'<link rel="icon"[^>]*sizes="192x192"[^>]*>','<link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png?v='+VERSION+'" />',s)
+          s=re.sub(r'<link rel="apple-touch-icon"[^>]*>','<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png?v='+VERSION+'" />',s)
+          s=re.sub(r'<link rel="shortcut icon"[^>]*>','<link rel="shortcut icon" href="./favicon-32.png?v='+VERSION+'" />',s)
+          s=re.sub(r'<title>.*?</title>','<title>Project V Uploader</title>',s,flags=re.S)
+          s=s.replace('<div class="mark"><b>V</b><i>↑</i></div>','<img class="master-icon" src="./apple-touch-icon.png?v='+VERSION+'" alt="Project V Uploader">')
+          s=re.sub(r'<img class="brandmark unified-icon"[^>]*>','<img class="master-icon" src="./apple-touch-icon.png?v='+VERSION+'" alt="Project V Uploader">',s)
+          if '.master-icon{' not in s:
+              s=s.replace('</style>','.master-icon{width:54px;height:54px;border-radius:11px;display:block;object-fit:cover;box-shadow:0 0 0 1px #596050,0 8px 24px #0008}</style>')
+          s=re.sub(r'<h1>.*?</h1>','<h1>Project V Uploader</h1>',s,count=1)
+          s=re.sub(r"navigator\.serviceWorker\.register\('\./service-worker\.js\?v=\d+'\)","navigator.serviceWorker.register('./service-worker.js?v="+VERSION+"')",s)
+          p.write_text(s)
+
+          manifest={
+            'name':'Project V Uploader',
+            'short_name':'Project V Uploader',
+            'description':'Resumable Project V archive uploader for Cloudflare R2.',
+            'start_url':'./?pwa='+VERSION,
+            'scope':'./','display':'standalone','orientation':'portrait',
+            'background_color':'#0b0e0b','theme_color':'#111511',
+            'icons':[
+              {'src':'./icon-192.png?v='+VERSION,'sizes':'192x192','type':'image/png','purpose':'any'},
+              {'src':'./icon-512.png?v='+VERSION,'sizes':'512x512','type':'image/png','purpose':'any'},
+              {'src':'./icon-512.png?v='+VERSION,'sizes':'512x512','type':'image/png','purpose':'maskable'}
+            ]
+          }
+          Path('manifest.webmanifest').write_text(json.dumps(manifest,indent=2)+'\n')
+          Path('service-worker.js').write_text("""const CACHE='project-v-uploader-v11';
+          const SHELL=['./','./index.html','./manifest.webmanifest','./brand-icon.svg','./favicon-32.png','./apple-touch-icon.png','./icon-192.png','./icon-512.png'];
+          self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(SHELL)));self.skipWaiting();});
+          self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==CACHE).map(x=>caches.delete(x)))));self.clients.claim();});
+          self.addEventListener('fetch',e=>{const u=new URL(e.request.url);if(e.request.method!=='GET'||u.origin!==self.location.origin)return;e.respondWith(fetch(e.request,{cache:'no-store'}).then(r=>{const c=r.clone();caches.open(CACHE).then(x=>x.put(e.request,c));return r}).catch(()=>caches.match(e.request).then(r=>r||caches.match('./index.html'))));});
+          """)
+          PY
+
+      - name: Commit synchronized branding
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html manifest.webmanifest service-worker.js brand-icon.svg favicon-32.png apple-touch-icon.png icon-192.png icon-512.png
+          git commit -m "Use white Project V Uploader icon everywhere" || exit 0
+          git push
