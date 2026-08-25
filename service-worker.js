@@ -1,4 +1,4 @@
-const CACHE='project-v-uploader-v7';
+const CACHE='project-v-uploader-v8';
 const SHELL=[
   './','./index.html','./manifest.webmanifest','./app-v7.css','./app-v7.js',
   './favicon-32.png','./apple-touch-icon.png','./icon-192.png','./icon-512.png'
