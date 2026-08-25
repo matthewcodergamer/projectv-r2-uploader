@@ -1,6 +1,6 @@
-const CACHE='project-v-uploader-v8';
+const CACHE='project-v-uploader-v9';
 const SHELL=[
-  './','./index.html','./manifest.webmanifest','./app-v7.css','./app-v7.js',
+  './','./index.html','./manifest.webmanifest',
   './favicon-32.png','./apple-touch-icon.png','./icon-192.png','./icon-512.png'
 ];
 self.addEventListener('install',event=>{
@@ -19,8 +19,8 @@ self.addEventListener('fetch',event=>{
     event.respondWith(fetch(event.request,{cache:'no-store'}).catch(()=>caches.match('./index.html')));
     return;
   }
-  event.respondWith(caches.match(event.request).then(hit=>hit||fetch(event.request).then(response=>{
+  event.respondWith(fetch(event.request,{cache:'no-store'}).then(response=>{
     if(response.ok){const copy=response.clone();caches.open(CACHE).then(cache=>cache.put(event.request,copy));}
     return response;
-  })));
+  }).catch(()=>caches.match(event.request)));
 });
