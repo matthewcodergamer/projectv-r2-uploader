@@ -1,8 +1,28 @@
-const CACHE='project-v-uploader-final-4';
-const SHELL=['./','./index.html','./manifest.webmanifest','./brand-icon.svg','./favicon-32.png','./apple-touch-icon.png'];
-const OLD_SOUND="const map={move:[520,.025,.028],accept:[760,.035,.035],back:[280,.03,.04]},[hz,vol,len]=map[kind]||map.move;";
-const NEW_SOUND="const banks={move:[[420,.020,.028],[510,.018,.026],[610,.016,.024],[355,.021,.030]],accept:[[720,.028,.040],[860,.026,.044],[640,.030,.038]],back:[[285,.024,.042],[340,.022,.040],[230,.025,.046]]},bank=banks[kind]||banks.move;let i=Math.floor(Math.random()*bank.length);if(bank.length>1&&i===tone._last)i=(i+1)%bank.length;tone._last=i;const [hz,vol,len]=bank[i];";
-function polish(html){return html.replaceAll('final-2','final-4').replace('<img class="brand-logo" src="./apple-touch-icon.png?v=final-4"','<img class="brand-logo" src="./brand-icon.svg?v=final-4"').replace(OLD_SOUND,NEW_SOUND);}
-self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(SHELL)));self.skipWaiting();});
-self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))));self.clients.claim();});
-self.addEventListener('fetch',e=>{const u=new URL(e.request.url);if(e.request.method!=='GET'||u.origin!==self.location.origin)return;if(e.request.mode==='navigate'||u.pathname.endsWith('/index.html')){e.respondWith(fetch(e.request,{cache:'no-store'}).then(async r=>{const text=polish(await r.text());return new Response(text,{status:r.status,statusText:r.statusText,headers:{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store'}})}).catch(()=>caches.match('./index.html').then(async r=>r?new Response(polish(await r.text()),{headers:{'Content-Type':'text/html; charset=utf-8'}}):Response.error())));return;}e.respondWith(fetch(e.request,{cache:'no-store'}).then(r=>{const copy=r.clone();caches.open(CACHE).then(c=>c.put(e.request,copy));return r}).catch(()=>caches.match(e.request)));});
+const CACHE='project-v-uploader-v7';
+const SHELL=[
+  './','./index.html','./manifest.webmanifest','./app-v7.css','./app-v7.js',
+  './favicon-32.png','./favicon.ico',
+  './apple-touch-icon.png','./apple-touch-icon-120.png','./apple-touch-icon-152.png','./apple-touch-icon-167.png',
+  './icon-192.png','./icon-512.png'
+];
+self.addEventListener('install',event=>{
+  event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(SHELL)).catch(()=>{}));
+  self.skipWaiting();
+});
+self.addEventListener('activate',event=>{
+  event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))));
+  self.clients.claim();
+});
+self.addEventListener('fetch',event=>{
+  if(event.request.method!=='GET')return;
+  const url=new URL(event.request.url);
+  if(url.origin!==self.location.origin)return;
+  if(event.request.mode==='navigate'){
+    event.respondWith(fetch(event.request,{cache:'no-store'}).catch(()=>caches.match('./index.html')));
+    return;
+  }
+  event.respondWith(caches.match(event.request).then(hit=>hit||fetch(event.request).then(response=>{
+    if(response.ok){const copy=response.clone();caches.open(CACHE).then(cache=>cache.put(event.request,copy));}
+    return response;
+  })));
+});
