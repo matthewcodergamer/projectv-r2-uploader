@@ -1,9 +1,11 @@
-const CACHE='project-v-uploader-v12-speed';
+const CACHE='project-v-uploader-v13';
 const SHELL=['./','./index.html','./manifest.webmanifest','./favicon-32.png','./apple-touch-icon.png','./icon-192.png','./icon-512.png'];
 
 function polishUI(html){
   return html
-    .replace('.logo{width:48px;height:48px;border-radius:15px;object-fit:cover;','.logo{width:48px;height:48px;border-radius:13px;object-fit:contain;overflow:hidden;background:transparent;')
+    .replaceAll('?v=9','?v=13')
+    .replace('service-worker.js?v=9','service-worker.js?v=13')
+    .replace('.logo{width:48px;height:48px;border-radius:15px;object-fit:cover;','.logo{width:48px;height:48px;border-radius:14px;object-fit:contain;overflow:hidden;background:transparent;')
     .replace("setConnection(false,'Checking…')","setConnection(true,'Checking…')")
     .replace('Uses up to <b>3 parallel streams</b>','Uses up to <b>6 parallel streams</b>')
     .replace('CONCURRENCY=3,MAX_RETRIES=12','CONCURRENCY=6,MAX_RETRIES=12');
