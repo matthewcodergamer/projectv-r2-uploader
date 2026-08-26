@@ -1,0 +1,1 @@
+Uploader v10 accepts .7z and .ISO source files, uses adaptive multipart concurrency, a 30-second per-part stall watchdog, durable completed-part checkpoints, and resume-from-checkpoint UI. The page also references fresh v10 icon filenames to avoid stale iOS icon caches.
