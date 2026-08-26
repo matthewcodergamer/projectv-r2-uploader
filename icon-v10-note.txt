@@ -1,0 +1,1 @@
+Project V Uploader icon cache version 10. The live page uses new v10 filenames so Safari/iOS does not reuse the previously cached blank icon.
