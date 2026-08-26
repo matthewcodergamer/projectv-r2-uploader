@@ -1,14 +1,16 @@
-const CACHE='project-v-uploader-v10';
+const CACHE='project-v-uploader-v11';
 const SHELL=[
   './','./index.html','./manifest.webmanifest',
   './favicon-32.png','./apple-touch-icon.png','./icon-192.png','./icon-512.png'
 ];
 
-function polishIcon(html){
-  return html.replace(
-    '.logo{width:48px;height:48px;border-radius:15px;object-fit:cover;',
-    '.logo{width:48px;height:48px;border-radius:0;object-fit:contain;overflow:visible;background:transparent;'
-  );
+function polishUI(html){
+  return html
+    .replace(
+      '.logo{width:48px;height:48px;border-radius:15px;object-fit:cover;',
+      '.logo{width:48px;height:48px;border-radius:13px;object-fit:contain;overflow:hidden;background:transparent;'
+    )
+    .replace("setConnection(false,'Checking…')","setConnection(true,'Checking…')");
 }
 
 self.addEventListener('install',event=>{
@@ -31,12 +33,12 @@ self.addEventListener('fetch',event=>{
       fetch(event.request,{cache:'no-store'})
         .then(async response=>{
           if(!response.ok)return response;
-          const html=polishIcon(await response.text());
+          const html=polishUI(await response.text());
           return new Response(html,{status:response.status,statusText:response.statusText,headers:{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store'}});
         })
         .catch(()=>caches.match('./index.html').then(async response=>{
           if(!response)return Response.error();
-          return new Response(polishIcon(await response.text()),{headers:{'Content-Type':'text/html; charset=utf-8'}});
+          return new Response(polishUI(await response.text()),{headers:{'Content-Type':'text/html; charset=utf-8'}});
         }))
     );
     return;
